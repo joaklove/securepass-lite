@@ -299,6 +299,8 @@ function applyLanguage(lang) {
   localStorage.setItem(LANG_KEY, currentLang)
   document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en'
   document.title = t('meta.title')
+  const desc = document.querySelector('meta[name="description"]')
+  if (desc) desc.setAttribute('content', t('meta.description'))
 
   for (const el of document.querySelectorAll('[data-i18n]')) {
     const key = el.dataset.i18n
