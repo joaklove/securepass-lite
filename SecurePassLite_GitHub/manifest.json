@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "SecurePass Lite",
+  "version": "0.1.0",
+  "description": "Offline password generator + local password book.",
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "action": {
+    "default_title": "SecurePass Lite",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    },
+    "default_popup": "popup.html"
+  },
+  "permissions": ["tabs"]
+}

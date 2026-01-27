@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SecurePass Lite</title>
+    <meta name="description" content="Generate strong passwords and save locally." />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div class="brand">
+          <div class="brand__title">SecurePass Lite</div>
+          <div class="brand__subtitle" data-i18n="header.subtitle">Offline • Stored in this browser (localStorage)</div>
+        </div>
+        <div class="header__right">
+          <nav class="nav" aria-label="Primary">
+            <button class="nav__tab" type="button" data-tab="generate" aria-current="page" data-i18n="nav.generate">Generate</button>
+            <button class="nav__tab" type="button" data-tab="book" data-i18n="nav.book">Password Book</button>
+            <button class="nav__tab" type="button" data-tab="help" data-i18n="nav.help">Help</button>
+            <button class="nav__tab" type="button" data-tab="settings" data-i18n="nav.settings">Settings</button>
+          </nav>
+          <select id="langSelect" class="lang" aria-label="Language">
+            <option value="en">English</option>
+            <option value="zh">中文</option>
+          </select>
+        </div>
+      </header>
+
+      <main class="main">
+        <section class="panel" data-panel="generate">
+          <div class="grid">
+            <div class="card">
+              <div class="card__header">
+                <h2 class="card__title" data-i18n="generator.title">Password Generator</h2>
+                <div class="card__hint" data-i18n="generator.hint">Use “Generate” for a cryptographically secure password.</div>
+              </div>
+
+              <div class="output">
+                <label class="field">
+                  <span class="field__label" data-i18n="generator.outputLabel">Generated Password</span>
+                  <div class="output__row">
+                    <input
+                      id="generatedPassword"
+                      class="output__input"
+                      type="text"
+                      inputmode="text"
+                      autocomplete="off"
+                      spellcheck="false"
+                      readonly
+                      placeholder="Click Generate"
+                      data-i18n-placeholder="generator.outputPlaceholder"
+                      aria-label="Generated password"
+                    />
+                    <button id="copyGenerated" class="btn btn--secondary" type="button" data-i18n="actions.copy">Copy</button>
+                    <button id="generateBtn" class="btn btn--primary" type="button" data-i18n="actions.generate">Generate</button>
+                  </div>
+                </label>
+
+                <div class="options">
+                  <div class="options__row">
+                    <label class="field">
+                      <span class="field__label" data-i18n="generator.length">Length</span>
+                      <div class="length">
+                        <input id="lengthRange" type="range" min="4" max="64" value="16" />
+                        <input
+                          id="lengthNumber"
+                          class="length__number"
+                          type="number"
+                          min="4"
+                          max="64"
+                          value="16"
+                          aria-label="Password length"
+                        />
+                      </div>
+                    </label>
+                  </div>
+
+                  <div class="options__row options__row--checks" role="group" aria-label="Character options">
+                    <label class="check">
+                      <input id="optUpper" type="checkbox" checked />
+                      <span data-i18n="generator.optUpper">Uppercase (A-Z)</span>
+                    </label>
+                    <label class="check">
+                      <input id="optLower" type="checkbox" checked />
+                      <span data-i18n="generator.optLower">Lowercase (a-z)</span>
+                    </label>
+                    <label class="check">
+                      <input id="optNumbers" type="checkbox" checked />
+                      <span data-i18n="generator.optNumbers">Numbers (0-9)</span>
+                    </label>
+                    <label class="check">
+                      <input id="optSymbols" type="checkbox" checked />
+                      <span data-i18n="generator.optSymbols">Symbols (!@#$%^&*)</span>
+                    </label>
+                    <label class="check check--advanced">
+                      <input id="optExcludeAmbiguous" type="checkbox" />
+                      <span data-i18n="generator.optExcludeAmbiguous">Exclude ambiguous characters (i, l, 1, L, o, 0, O)</span>
+                    </label>
+                  </div>
+
+                  <div id="generatorError" class="alert alert--error" role="alert" hidden></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card__header">
+                <h2 class="card__title" data-i18n="qr.title">QR Code</h2>
+                <div class="card__hint" data-i18n="qr.hint">Scan on mobile to transfer the password privately.</div>
+              </div>
+              <div class="qr">
+                <div class="qr__box" id="qrBox" aria-label="QR code"></div>
+                <div class="qr__note" data-i18n="qr.note">Treat QR like plain text. Avoid public display.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card__header">
+              <h2 class="card__title" data-i18n="save.title">Save to Password Book</h2>
+              <div class="card__hint" data-i18n="save.hint">Saves locally to this browser only.</div>
+            </div>
+
+            <form id="saveForm" class="form">
+              <div class="form__row">
+                <label class="field">
+                  <span class="field__label" data-i18n="save.siteLabel">Website / App Name *</span>
+                  <input id="siteInput" class="input" type="text" maxlength="120" required />
+                </label>
+                <label class="field">
+                  <span class="field__label" data-i18n="save.usernameLabel">Username / Account ID (optional)</span>
+                  <input id="usernameInput" class="input" type="text" maxlength="160" />
+                </label>
+              </div>
+              <div class="form__row form__row--actions">
+                <button id="saveBtn" class="btn btn--primary" type="submit" data-i18n="save.saveBtn">Save to Password Book</button>
+                <div id="saveError" class="alert alert--error" role="alert" hidden></div>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="book" hidden>
+          <div class="card">
+            <div class="card__header">
+              <h2 class="card__title" data-i18n="book.title">Password Book</h2>
+              <div class="card__hint"><span data-i18n="book.storageHintPrefix">Stored in localStorage key:</span> <span class="mono">mySecurePasswords</span></div>
+            </div>
+
+            <div class="toolbar">
+              <label class="field field--inline">
+                <span class="field__label" data-i18n="book.searchLabel">Search</span>
+                <input id="searchInput" class="input" type="search" placeholder="Filter by site name" data-i18n-placeholder="book.searchPlaceholder" />
+              </label>
+              <button id="clearAllBtn" class="btn btn--danger" type="button" data-i18n="book.deleteAll">Delete All</button>
+            </div>
+
+            <div id="emptyState" class="empty" hidden>
+              <div class="empty__title" data-i18n="book.emptyTitle">No saved passwords yet</div>
+              <div class="empty__text" data-i18n="book.emptyText">Generate a password and save it to your Password Book.</div>
+              <button class="btn btn--primary" type="button" data-switch-to="generate" data-i18n="book.goToGenerator">Go to Generator</button>
+            </div>
+
+            <div class="tableWrap" aria-label="Saved password entries">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th data-i18n="table.site">Website / App</th>
+                    <th data-i18n="table.username">Username</th>
+                    <th data-i18n="table.password">Password</th>
+                    <th data-i18n="table.created">Created</th>
+                    <th class="table__actions" data-i18n="table.actions">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="bookTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="help" hidden>
+          <div class="card">
+            <div class="card__header">
+              <h2 class="card__title" data-i18n="help.title">Help & Security Notes</h2>
+              <div class="card__hint" data-i18n="help.hint">SecurePass Lite is offline-first. No server is used.</div>
+            </div>
+            <div class="help">
+              <div class="help__block">
+                <h3 class="help__title" data-i18n="help.storageTitle">Storage</h3>
+                <p class="help__text" data-i18n="help.storageText">Your data is stored in your current browser’s localStorage. Clearing site data or using private mode may remove it.</p>
+              </div>
+              <div class="help__block">
+                <h3 class="help__title" data-i18n="help.clipboardTitle">Clipboard</h3>
+                <p class="help__text" data-i18n="help.clipboardText">Copied passwords may be readable by other apps on your device. Clear your clipboard if needed.</p>
+              </div>
+              <div class="help__block">
+                <h3 class="help__title" data-i18n="help.qrTitle">QR Code Safety</h3>
+                <p class="help__text" data-i18n="help.qrText">A QR code is equivalent to showing the password in plaintext. Only use it in private.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="settings" hidden>
+          <div class="card">
+            <div class="card__header">
+              <h2 class="card__title" data-i18n="settings.title">Settings</h2>
+              <div class="card__hint" data-i18n="settings.hint">Export or import your local password book.</div>
+            </div>
+
+            <div class="backup">
+              <div class="backup__row">
+                <div class="backup__meta">
+                  <div class="backup__title" data-i18n="settings.backupTitle">Data Backup</div>
+                  <div class="backup__desc" data-i18n="settings.backupDesc">Export downloads a file. Import overwrites your current data.</div>
+                </div>
+                <div class="backup__actions">
+                  <button id="exportBtn" class="btn btn--secondary" type="button" data-i18n="settings.export">Export</button>
+                  <button id="importBtn" class="btn btn--primary" type="button" data-i18n="settings.import">Import</button>
+                  <input id="importFile" type="file" accept="application/json,.json" hidden />
+                </div>
+              </div>
+              <div id="importError" class="alert alert--error" role="alert" hidden></div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <div class="footer__text" data-i18n="footer.text">SecurePass Lite • No backend • Local only</div>
+      </footer>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+    <script src="./qrcode.min.js"></script>
+    <script src="./script.js"></script>
+  </body>
+</html>
